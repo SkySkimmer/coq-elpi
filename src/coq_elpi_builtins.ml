@@ -3465,7 +3465,7 @@ Supported attributes:
     try
       let sigma = get_sigma state in
       let flags = if proof_context.options.no_tc = Some true then {(Pretyping.default_inference_flags false) with  use_typeclasses = NoUseTC} else Pretyping.default_inference_flags false in
-      let expected_type = Pretyping.IsType in
+      let expected_type = Pretyping.is_type in
       let sigma, uj_val, uj_type =
         Pretyping.understand_tcc_ty ~flags proof_context.env sigma ~expected_type gt in
       let sort = EConstr.ESorts.kind sigma @@ EConstr.destSort sigma uj_type in

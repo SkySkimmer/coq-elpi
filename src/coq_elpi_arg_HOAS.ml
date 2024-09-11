@@ -26,7 +26,7 @@ let push_glob_ctx glob_ctx x =
 let push_inductive_in_intern_env intern_env name params arity user_impls =
   let env = Global.env () in
   let sigma = Evd.from_env env in
-  let sigma, ty = Pretyping.understand_tcc env sigma ~expected_type:Pretyping.IsType (Coq_elpi_utils.mk_gforall arity params) in
+  let sigma, ty = Pretyping.understand_tcc env sigma ~expected_type:Pretyping.is_type (Coq_elpi_utils.mk_gforall arity params) in
   ty, Constrintern.compute_internalization_env env sigma ~impls:intern_env
     Constrintern.Inductive [name] [ty] [user_impls]
 
@@ -36,7 +36,7 @@ let intern_global_constr { Ltac_plugin.Tacintern.genv = env } ~intern_env t =
   let sigma = Evd.from_env env in
   Constrintern.intern_gen Pretyping.WithoutTypeConstraint env sigma ~impls:intern_env ~pattern_mode:false ~ltacvars:Constrintern.empty_ltac_sign t
 
-let intern_global_constr_ty { Ltac_plugin.Tacintern.genv = env } ~intern_env ?(expty=Pretyping.IsType) t =
+let intern_global_constr_ty { Ltac_plugin.Tacintern.genv = env } ~intern_env ?(expty=Pretyping.is_type) t =
   let sigma = Evd.from_env env in
   Constrintern.intern_gen expty env sigma ~impls:intern_env ~pattern_mode:false ~ltacvars:Constrintern.empty_ltac_sign t
 
