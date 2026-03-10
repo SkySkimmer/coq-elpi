@@ -969,7 +969,7 @@ let in_elpi_primitive_value ~depth state = function
 | C.Float f ->  in_elpi_primitive ~depth state (Float64 f)
 | C.String s -> in_elpi_primitive ~depth state (Pstring s)
 | C.Array _ -> nYI "HOAS for persistent arrays"
-| (C.Fix _ | C.CoFix _ | C.Lambda _ | C.App _ | C.Prod _ | C.Case _ | C.Cast _ | C.Construct _ | C.LetIn _ | C.Ind _ | C.Meta _ | C.Rel _ | C.Var _ | C.Proj _ | C.Evar _ | C.Sort _ | C.Const _) -> assert false
+| (C.Fix _ | C.CoFix _ | C.Lambda _ | C.Nat _ | C.App _ | C.Prod _ | C.Case _ | C.Cast _ | C.Construct _ | C.LetIn _ | C.Ind _ | C.Meta _ | C.Rel _ | C.Var _ | C.Proj _ | C.Evar _ | C.Sort _ | C.Const _) -> assert false
 
 (* ********************************* }}} ********************************** *)
 
@@ -1537,7 +1537,8 @@ let rec constr2lp coq_ctx ~calldepth ~depth state t =
   assert(depth >= coq_ctx.proof_len);
   let { sigma } = S.get engine state in
   let gls = ref [] in
-  let rec aux ~depth env state t = match EC.kind sigma t with
+  let rec aux ~depth env state t = match EC.kind_nonat sigma t with
+    | C.Nat _ -> assert false (* kind_nonat *)
     | C.Rel n -> state, E.mkConst (depth - n)
     | C.Var n ->
          begin
@@ -1621,7 +1622,7 @@ let rec constr2lp coq_ctx ~calldepth ~depth state t =
          state, in_elpi_app ~depth p [|t|]
     | C.Fix _ -> nYI "HOAS for mutual fix"
     | C.CoFix _ -> nYI "HOAS for cofix"
-    | x -> in_elpi_primitive_value ~depth state x
+    | (Int _ | Float _ | String _ | Array _) as x -> in_elpi_primitive_value ~depth state x
   in
   debug Pp.(fun () ->
       str"term2lp: depth=" ++ int depth ++

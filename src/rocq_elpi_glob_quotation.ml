@@ -367,6 +367,15 @@ let gterm2lpast ~pattern ~language state glob =
       let l' = List.map (glob_level x.CAst.loc state) l in
       in_elpiast_poly_gr_instance ~loc gr (UVars.Instance.of_array ([||], Array.of_list l'))
     end
+  | GNat (ind,n) ->
+    let ctor = Constr.ctor_of_nat ind n in
+    let g = if Z.equal n Z.zero then DAst.make ~loc:coqloc @@ GRef (ConstructRef ctor, None)
+      else
+        DAst.make ~loc:coqloc @@
+        GApp (DAst.make ~loc:coqloc @@ GRef (ConstructRef ctor, None),
+              [DAst.make ~loc:coqloc @@ GNat (ind, Z.pred n)])
+    in
+    gterm2lp state g
   | GRef(gr,_ul) -> in_elpiast_gr ~loc gr
   | GVar(id) -> lookup_bound ~loc ~coqloc id state
   | GSort _ as t when rigid_anon_type t ->
